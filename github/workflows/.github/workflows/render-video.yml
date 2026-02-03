@@ -1,0 +1,43 @@
+name: Render Video — Equação do Movimento (Spontânea)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy matplotlib "imageio[ffmpeg]"
+
+      - name: Run render
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python render.py
+          echo "Files:"
+          ls -lah
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VIDEO_OUTPUT
+          path: "*.mp4"
+          if-no-files-found: error

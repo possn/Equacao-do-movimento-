@@ -1,4 +1,4 @@
-name: Render Equação do Movimento
+name: Render Equacao Movimento (Spont -> VNI)
 
 on:
   workflow_dispatch:
@@ -6,33 +6,30 @@ on:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install numpy matplotlib "imageio[ffmpeg]"
 
-      - name: Run render (headless)
+      - name: Run render
         env:
           MPLBACKEND: Agg
         run: |
           python render.py
-          echo "Generated files:"
           ls -lah
 
       - name: Upload video artifact
